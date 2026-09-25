@@ -15,10 +15,10 @@ services:
       - APP_DEBUG=true
       - DB_CONNECTION=pgsql
       - DB_HOST=postgres
-      - DB_PORT=5432
+      - DB_PORT=5433
       - DB_DATABASE=${DB_DATABASE:-corestack}
-      - DB_USERNAME=${DB_USERNAME:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-1234}
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - CACHE_STORE=redis
@@ -28,7 +28,7 @@ services:
     volumes:
       # Mapeia o código fonte para desenvolvimento (Hot Reloading/Watch)
       - .:/var/www/html
-      # Volumes anonimos/nomeados para evitar que o mapeamento do host sobrescreva 
+      # Volumes anonimos/nomeados para evitar que o mapeamento do host sobrescreva
       # os arquivos do build interno do container
       - vendor_data:/var/www/html/vendor
       - storage_data:/var/www/html/storage
@@ -45,7 +45,7 @@ services:
     container_name: laravel_postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_DB: ${DB_DATABASE:-corestack}
       POSTGRES_USER: ${DB_USERNAME:-postgres}

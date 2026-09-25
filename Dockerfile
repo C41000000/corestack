@@ -17,6 +17,9 @@ RUN apk update && apk add --no-cache \
     git \
     bash \
     linux-headers \
+    autoconf \
+    g++ \
+    make \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
         pdo_pgsql \
@@ -26,7 +29,10 @@ RUN apk update && apk add --no-cache \
         gd \
         intl \
         opcache \
-        sockets
+        sockets \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del autoconf g++ make
 
 # ==========================================
 # Stage 2: Builder (Composer)
