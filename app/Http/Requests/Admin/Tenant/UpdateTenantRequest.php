@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\Tenant;
 
 use App\Models\Tenant;
+use Dedoc\Scramble\Attributes\BodyParameter;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+#[BodyParameter('domain', description: 'Novo domínio ou subdomínio do tenant (opcional)', type: 'string', example: 'novo-dominio.localhost')]
+#[BodyParameter('is_active', description: 'Novo status de ativação do tenant (opcional)', type: 'boolean', example: false)]
+#[BodyParameter('data', description: 'Novos atributos e metadados para mesclar com os existentes (opcional)', type: 'object', example: ['company' => 'Empresa Atualizada S.A.'])]
 final class UpdateTenantRequest extends FormRequest
 {
     /**

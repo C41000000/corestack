@@ -24,7 +24,7 @@ This project is built using cutting-edge tools to mirror a real-world enterprise
 
 ---
 
-## 🛠️ Getting Started (Local Development)
+## Getting Started (Local Development)
 
 Make sure you have **Docker** and **Docker Compose** installed on your machine.
 

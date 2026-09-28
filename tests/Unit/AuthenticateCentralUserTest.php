@@ -91,7 +91,6 @@ it('should throttle based on specific client ip address', function () {
 
     try {
         $action->execute($dtoIpB);
-
     } catch (ValidationException $e) {
         expect($e->status)->not->toBe(429);
     }

@@ -24,6 +24,10 @@ beforeEach(function () {
 });
 
 afterEach(function () {
+    if (tenant()) {
+        tenancy()->end();
+    }
+
     foreach (glob(database_path('tenant*')) as $file) {
         if (is_file($file)) {
             @unlink($file);
@@ -33,7 +37,7 @@ afterEach(function () {
 
 it('denies unauthenticated access to tenant endpoints', function () {
     auth('api')->logout();
-    $response = $this->getJson('/api/admin/tenants');
+    $response = $this->getJson('/api/v1/admin/tenants');
     $response->assertStatus(401);
 });
 
@@ -41,7 +45,7 @@ it('lists tenants for authenticated user', function () {
     $tenant = Tenant::create(['id' => 'foo', 'is_active' => true]);
     $tenant->createDomain(['domain' => 'foo.localhost']);
 
-    $response = $this->getJson('/api/admin/tenants', $this->headers);
+    $response = $this->getJson('/api/v1/admin/tenants', $this->headers);
 
     $response->assertStatus(200)
         ->assertJsonStructure([
@@ -61,7 +65,7 @@ it('creates a tenant successfully', function () {
         'data' => ['company' => 'Acme Corp'],
     ];
 
-    $response = $this->postJson('/api/admin/tenants', $payload, $this->headers);
+    $response = $this->postJson('/api/v1/admin/tenants', $payload, $this->headers);
     $response->assertStatus(201)
         ->assertJsonPath('id', 'acme-corp')
         ->assertJsonPath('is_active', true)
@@ -87,7 +91,7 @@ it('fails to create a tenant with duplicate domain', function () {
         'domain' => 'shared.localhost',
     ];
 
-    $response = $this->postJson('/api/admin/tenants', $payload, $this->headers);
+    $response = $this->postJson('/api/v1/admin/tenants', $payload, $this->headers);
 
     $response->assertStatus(422)
         ->assertJsonValidationErrors(['domain']);
@@ -97,7 +101,7 @@ it('shows a specific tenant', function () {
     $tenant = Tenant::create(['id' => 'show-me', 'is_active' => true]);
     $tenant->createDomain(['domain' => 'showme.localhost']);
 
-    $response = $this->getJson("/api/admin/tenants/{$tenant->id}", $this->headers);
+    $response = $this->getJson("/api/v1/admin/tenants/{$tenant->id}", $this->headers);
 
     $response->assertStatus(200)
         ->assertJsonPath('id', 'show-me')
@@ -114,7 +118,7 @@ it('updates a tenant successfully', function () {
         'data' => ['name' => 'Updated'],
     ];
 
-    $response = $this->putJson("/api/admin/tenants/{$tenant->id}", $payload, $this->headers);
+    $response = $this->putJson("/api/v1/admin/tenants/{$tenant->id}", $payload, $this->headers);
 
     $response->assertStatus(200)
         ->assertJsonPath('id', 'update-me')
@@ -132,7 +136,7 @@ it('deactivates a tenant on delete endpoint', function () {
     $tenant = Tenant::create(['id' => 'delete-me', 'is_active' => true]);
     $tenant->createDomain(['domain' => 'todelete.localhost']);
 
-    $response = $this->deleteJson("/api/admin/tenants/{$tenant->id}", [], $this->headers);
+    $response = $this->deleteJson("/api/v1/admin/tenants/{$tenant->id}", [], $this->headers);
 
     $response->assertStatus(200)
         ->assertJson(['message' => 'Tenant deleted successfully.']);
@@ -140,5 +144,21 @@ it('deactivates a tenant on delete endpoint', function () {
     $this->assertDatabaseHas('tenants', [
         'id' => 'delete-me',
         'is_active' => false,
+    ]);
+});
+
+it('reactivates an inactive tenant successfully', function () {
+    $tenant = Tenant::create(['id' => 'reactivate-me', 'is_active' => false]);
+    $tenant->createDomain(['domain' => 'inactive.localhost']);
+
+    $response = $this->postJson("/api/v1/admin/tenants/{$tenant->id}/reactivate", [], $this->headers);
+
+    $response->assertStatus(200)
+        ->assertJsonPath('id', 'reactivate-me')
+        ->assertJsonPath('is_active', true);
+
+    $this->assertDatabaseHas('tenants', [
+        'id' => 'reactivate-me',
+        'is_active' => true,
     ]);
 });

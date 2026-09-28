@@ -49,6 +49,10 @@ return [
             'driver' => 'jwt',
             'provider' => 'central_users',
         ],
+        'tenant_api' => [
+            'driver' => 'jwt',
+            'provider' => 'users',
+        ],
     ],
 
     /*

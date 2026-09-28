@@ -12,7 +12,7 @@ it('should allow central user to login with valid credentials', function () {
         'password' => Hash::make($password),
     ]);
 
-    $response = $this->postJson('/api/auth/central-login', [
+    $response = $this->postJson('/api/v1/auth/central-login', [
         'email' => 'central@example.com',
         'password' => $password,
     ]);
@@ -26,7 +26,7 @@ it('should reject login with invalid credentials', function () {
         'password' => Hash::make('password'),
     ]);
 
-    $response = $this->postJson('/api/auth/central-login', [
+    $response = $this->postJson('/api/v1/auth/central-login', [
         'email' => 'central@example.com',
         'password' => 'wrong-password',
     ]);
@@ -37,13 +37,13 @@ it('should reject login with invalid credentials', function () {
 
 it('should return 429 when rate limit is exceeded', function () {
     for ($i = 0; $i < 5; $i++) {
-        $this->postJson('/api/auth/central-login', [
+        $this->postJson('/api/v1/auth/central-login', [
             'email' => 'central@example.com',
             'password' => 'wrong-password',
         ]);
     }
 
-    $response = $this->postJson('/api/auth/central-login', [
+    $response = $this->postJson('/api/v1/auth/central-login', [
         'email' => 'central@example.com',
         'password' => 'wrong-password',
     ]);
