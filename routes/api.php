@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,4 +15,8 @@ Route::prefix('auth')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('central-login', 'login');
     });
+});
+
+Route::prefix('admin')->middleware('auth:api')->group(function () {
+    Route::apiResource('tenants', TenantController::class);
 });

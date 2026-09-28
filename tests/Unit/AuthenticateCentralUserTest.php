@@ -5,8 +5,6 @@ declare(strict_types=1);
 use App\Actions\Auth\AuthenticateCentralUser;
 use App\DTOs\Auth\LoginDTO;
 use App\Models\CentralUser;
-use Illuminate\Auth\Events\Lockout;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -77,13 +75,12 @@ it('should throttle based on specific client ip address', function () {
         clientIpAddress: '10.0.0.5'
     );
 
-
     for ($i = 0; $i < 5; $i++) {
         try {
             $action->execute($dtoIpA);
-        } catch (ValidationException) {}
+        } catch (ValidationException) {
+        }
     }
-
 
     try {
         $action->execute($dtoIpA);
@@ -91,7 +88,6 @@ it('should throttle based on specific client ip address', function () {
     } catch (ValidationException $e) {
         expect($e->status)->toBe(429);
     }
-
 
     try {
         $action->execute($dtoIpB);
